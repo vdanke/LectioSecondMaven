@@ -1,37 +1,31 @@
 package org.step.lectio.maven.project.controller;
 
 import org.step.lectio.maven.project.model.User;
-import org.step.lectio.maven.project.repository.dao.UserDAO;
+import org.step.lectio.maven.project.service.UserService;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 
 /*
 URI - /main
  */
 public class MainController extends HttpServlet {
 
-    private final UserDAO userDAO = new UserDAO();
+    private final UserService userService = new UserService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 //        resp.getWriter().write("This is first response");
-        List<User> all = new ArrayList<>();
-        try {
-            all = userDAO.findAll();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        List<User> all = userService.findAll();
+
         req.setAttribute("users", all);
 
 //        resp.sendRedirect("/main.jsp");
@@ -51,13 +45,8 @@ public class MainController extends HttpServlet {
 
         User user = new User(id, username, password);
 
-        boolean isSaved = false;
+        boolean isSaved = userService.save(user);
 
-        try {
-            isSaved = userDAO.save(user);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
         System.out.println(isSaved);
 
         if (isSaved) {
