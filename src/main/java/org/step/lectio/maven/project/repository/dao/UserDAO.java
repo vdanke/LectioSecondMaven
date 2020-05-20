@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDAO {
+public class UserDAO implements CRUDInterface {
 
     private static final String FIND_ALL = "SELECT * FROM USERS";
     private static final String SAVE_USER = "INSERT INTO USERS(id, username, password) values (?, ?, ?)";

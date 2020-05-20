@@ -1,32 +1,44 @@
 package org.step.lectio.maven.project.controller;
 
 import org.step.lectio.maven.project.model.User;
-import org.step.lectio.maven.project.service.UserService;
+import org.step.lectio.maven.project.service.UserServiceImpl;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /*
 URI - /main
  */
 public class MainController extends HttpServlet {
 
-    private final UserService userService = new UserService();
+    private final UserServiceImpl userServiceImpl = new UserServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 //        resp.getWriter().write("This is first response");
-        List<User> all = userService.findAll();
+        List<User> all = userServiceImpl.findAll();
+        String username = "";
+
+        HttpSession session = req.getSession();
+        User userInSession = (User) session.getAttribute("userInSession");
+
+        Cookie[] cookies = req.getCookies();
+
+        Optional<Cookie> usernameInCookie = Arrays.stream(cookies)
+                .filter(cookie -> cookie.getName().equalsIgnoreCase("usernameInCookie"))
+                .findAny();
+
+        if (usernameInCookie.isPresent()) {
+            username = usernameInCookie.get().getValue();
+        } else {
+            username = userInSession.getUsername();
+        }
 
         req.setAttribute("users", all);
+        req.setAttribute("username", username);
 
 //        resp.sendRedirect("/main.jsp");
 
@@ -45,7 +57,7 @@ public class MainController extends HttpServlet {
 
         User user = new User(id, username, password);
 
-        boolean isSaved = userService.save(user);
+        boolean isSaved = userServiceImpl.save(user);
 
         System.out.println(isSaved);
 
