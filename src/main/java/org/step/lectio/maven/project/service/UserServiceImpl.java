@@ -1,5 +1,7 @@
 package org.step.lectio.maven.project.service;
 
+import org.step.lectio.maven.project.ApplicationContext;
+import org.step.lectio.maven.project.CustomApplicationContext;
 import org.step.lectio.maven.project.model.User;
 import org.step.lectio.maven.project.repository.dao.UserDAO;
 
@@ -7,16 +9,23 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Random;
 
+@Component
 public class UserServiceImpl implements UserService {
 
-    private final UserDAO userDAO = new UserDAO();
+    ApplicationContext<UserDAO> context = new CustomApplicationContext();
+
+//    private UserDAO userDAO = context.getBean("userDao");
+
+    @Autowired
+    private UserDAO userDAO;
 
     public boolean save(User user) {
         try {
             return userDAO.save(user);
         } catch (SQLException e) {
-            throw new IllegalArgumentException("Something went wrong");
+            e.printStackTrace();
         }
+        return false;
     }
 
     public List<User> findAll() {
